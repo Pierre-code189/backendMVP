@@ -1,0 +1,45 @@
+services:
+  api:
+    build: .
+    container_name: mvp-api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: db
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-mvp_db}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    networks:
+      - mvp-network
+
+  db:
+    image: postgres:16-alpine
+    container_name: mvp-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-mvp_db}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-mvp_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - mvp-network
+
+volumes:
+  pgdata:
+    name: mvp-pgdata
+
+networks:
+  mvp-network:
+    driver: bridge
