@@ -21,3 +21,22 @@ class ProductCategory(str, Enum):
     TOOLS = "herramientas"
     BOOKS = "libros"
     OTHER = "otro"
+
+
+class AlertCategory(str, Enum):
+    """Categories for neighborhood emergency and hazard alerts."""
+    INFRASTRUCTURE = "infraestructura"   # buzon de desague abierto, poste caido, cable expuesto
+    NATURAL_DISASTER = "desastre_natural" # rio desbordado, inundacion, huaico
+    SECURITY = "seguridad"                # lugar peligroso, robo, actividad sospechosa
+    ACCIDENT = "accidente"                # choque, fuga de gas, incendio
+    HEALTH = "salud"                      # emergencia medica
+    OTHER = "otro"
+
+
+class UrgencyLevel(str, Enum):
+    """Urgency / severity level of an alert."""
+    LOW = "baja"
+    MEDIUM = "media"
+    HIGH = "alta"
+    CRITICAL = "critica"
+

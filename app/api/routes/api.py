@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.routes import user, auth, service, product
+from app.api.routes import user, auth, service, product, alert, order
 
 apiRouter = APIRouter(prefix="/api", tags=["API"])
 
@@ -8,6 +8,8 @@ apiRouter.include_router(auth.router)
 apiRouter.include_router(user.router)
 apiRouter.include_router(service.router)
 apiRouter.include_router(product.router)
+apiRouter.include_router(alert.router)
+apiRouter.include_router(order.router)
 
 
 @apiRouter.get("/")
@@ -24,5 +26,7 @@ def api_root():
             "users":         {"href": "/api/users", "method": "GET"},
             "services":      {"href": "/api/services", "method": "GET"},
             "products":      {"href": "/api/products", "method": "GET"},
+            "alerts":        {"href": "/api/alerts", "method": "GET"},
+            "my_orders":     {"href": "/api/orders/my-orders", "method": "GET"},
         },
     }

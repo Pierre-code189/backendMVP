@@ -4,10 +4,10 @@ from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from app.infrastructure.database.connection import get_db
-from app.api.schemas.user import UserOut, UserUpdate
+from app.api.schemas.user import UserOut, UserUpdate, UserRoleUpdate
 from app.api.schemas.hateoas import Link, with_links
 from app.services import user_service
-from app.usecases.auth import get_current_active_user
+from app.usecases.auth import get_current_active_user, get_current_admin
 from app.domain.models.user import User
 
 router = APIRouter(prefix="/users", tags=["Usuarios"])
@@ -99,4 +99,24 @@ def deactivate_user(
     return with_links(
         UserOut.model_validate(user),
         {"collection": Link(href="/api/users")},
+    )
+
+
+@router.patch("/{user_id}/role")
+def change_user_role(
+    user_id: uuid.UUID,
+    role_data: UserRoleUpdate,
+    db: Session = Depends(get_db),
+    admin_user: User = Depends(get_current_admin),
+):
+    """
+    Cambia el rol de un usuario (administrator, moderator, user). Solo accesible por administradores.
+    """
+    user = user_service.update_role(db, user_id, role_data.role, admin_user)
+    return with_links(
+        UserOut.model_validate(user),
+        {
+            "self": Link(href=f"/api/users/{user_id}"),
+            "collection": Link(href="/api/users"),
+        },
     )

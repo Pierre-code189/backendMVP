@@ -16,6 +16,7 @@ class User(Base):
         PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
     dni: Mapped[str] = mapped_column(String(20), unique=True, nullable=False)
+    phone: Mapped[str] = mapped_column(String(20), unique=True, nullable=False)
     username: Mapped[str] = mapped_column(String(50), unique=True, nullable=False, index=True)
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -31,3 +32,6 @@ class User(Base):
     # Relationships
     services: Mapped[list["Service"]] = relationship("Service", back_populates="owner", cascade="all, delete-orphan")
     products: Mapped[list["Product"]] = relationship("Product", back_populates="owner", cascade="all, delete-orphan")
+    alerts: Mapped[list["Alert"]] = relationship("Alert", back_populates="owner", cascade="all, delete-orphan")
+    orders_bought: Mapped[list["Order"]] = relationship("Order", foreign_keys="Order.buyer_id", back_populates="buyer", cascade="all, delete-orphan")
+    orders_sold: Mapped[list["Order"]] = relationship("Order", foreign_keys="Order.seller_id", back_populates="seller", cascade="all, delete-orphan")

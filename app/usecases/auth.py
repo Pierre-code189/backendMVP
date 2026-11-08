@@ -11,8 +11,10 @@ from sqlalchemy.orm import Session
 from app.config.settings import settings
 from app.infrastructure.database.connection import get_db
 from app.domain.models.user import User
+from app.domain.models.role import Roles
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+
 
 
 def hash_password(password: str) -> str:
@@ -71,3 +73,19 @@ def get_current_active_user(current_user: User = Depends(get_current_user)) -> U
     if not current_user.is_active:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Cuenta inactiva")
     return current_user
+
+
+def require_roles(*allowed_roles: Roles):
+    """Dependency factory checking that the current active user possesses one of the required roles."""
+    def role_checker(current_user: User = Depends(get_current_active_user)) -> User:
+        if current_user.role not in allowed_roles:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Permisos insuficientes para esta operación",
+            )
+        return current_user
+    return role_checker
+
+
+get_current_admin = require_roles(Roles.ADMIN)
+get_current_staff = require_roles(Roles.MOD, Roles.ADMIN)

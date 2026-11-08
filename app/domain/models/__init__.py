@@ -2,5 +2,7 @@
 from app.domain.models.user import User
 from app.domain.models.service import Service
 from app.domain.models.product import Product
+from app.domain.models.alert import Alert
+from app.domain.models.order import Order, OrderItemType, OrderStatus
 
-__all__ = ["User", "Service", "Product"]
+__all__ = ["User", "Service", "Product", "Alert", "Order", "OrderItemType", "OrderStatus"]
