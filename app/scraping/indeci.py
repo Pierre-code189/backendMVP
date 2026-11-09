@@ -10,6 +10,7 @@ from __future__ import annotations
 import re
 import unicodedata
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 from typing import Iterable, Optional
 from urllib.parse import urljoin
 
@@ -19,6 +20,9 @@ from bs4 import BeautifulSoup
 from app.config.settings import settings
 
 DEFAULT_SOURCE = "INDECI"
+# Las fechas del portal son locales del Perú; guardarlas como medianoche UTC
+# las mostraba un día antes al convertirlas a America/Lima.
+ZONA_LIMA = ZoneInfo("America/Lima")
 DEFAULT_URL = "https://portal.indeci.gob.pe/informe/informe-de-peligros/"
 USER_AGENT = "VecinalSolidaria/1.0 (+https://github.com/Pierre-code189/app-vecinal-mobile)"
 
@@ -59,7 +63,7 @@ def parsear_fecha(texto: str) -> Optional[datetime]:
     if m:
         dia, mes, anio = (int(x) for x in m.groups())
         try:
-            return datetime(anio, mes, dia, tzinfo=timezone.utc)
+            return datetime(anio, mes, dia, tzinfo=ZONA_LIMA)
         except ValueError:
             pass
 
@@ -74,7 +78,7 @@ def parsear_fecha(texto: str) -> Optional[datetime]:
         anio = int(m.group(3))
         if mes:
             try:
-                return datetime(anio, mes, dia, tzinfo=timezone.utc)
+                return datetime(anio, mes, dia, tzinfo=ZONA_LIMA)
             except ValueError:
                 pass
     return None

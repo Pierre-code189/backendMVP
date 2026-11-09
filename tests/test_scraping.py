@@ -6,6 +6,7 @@ lo que crean, para poder repetirlas sin acumular registros.
 """
 
 import uuid
+from datetime import timedelta
 
 import pytest
 from fastapi.testclient import TestClient
@@ -66,6 +67,9 @@ def test_parsear_fecha_formatos(texto, esperado):
     fecha = parsear_fecha(texto)
     assert fecha is not None
     assert (fecha.year, fecha.month, fecha.day) == esperado
+    # La fecha del portal es local del Perú: medianoche en Lima, no en UTC.
+    assert fecha.utcoffset() == timedelta(hours=-5)
+    assert fecha.hour == 0
 
 
 def test_parsear_fecha_sin_fecha_devuelve_none():
